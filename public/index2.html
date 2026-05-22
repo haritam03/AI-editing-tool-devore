@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Photo Editing Platform — Full Demo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sb:#141412;--sb2:#1C1C1A;--sbt:#9B9690;--sbh:#242422;
+  --bg:#F5F3EF;--card:#FFFFFF;--bd:#E8E4DC;--t1:#111110;--t2:#6B6660;--t3:#A8A39D;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shm:0 4px 16px rgba(0,0,0,.1);
+  --r:10px;--r2:6px;
+  --gn:#0A5F43;--gnl:#EDFAF4;--gnb:#B7F0D6;
+  --pu:#3D32B0;--pul:#F0EEFF;--pub:#C4BCE8;
+  --am:#D97706;--aml:#FFFBEB;--amb:#FDE68A;
+  --rd:#DC2626;--rdl:#FEF2F2;--rdb:#FCA5A5;
+  --bl:#1E40AF;--bll:#EFF6FF;--blb:#BFDBFE;
+}
+body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit;cursor:pointer}
+input,select,textarea{font-family:'Inter',sans-serif;font-size:12px;padding:8px 11px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);color:var(--t1);width:100%;transition:border-color .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#999}
+/* ── Chrome ── */
+.chrome{background:var(--sb);padding:8px 14px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:200;flex-wrap:wrap;min-height:44px}
+.c-logo{display:flex;align-items:center;gap:7px;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.c-dot{width:26px;height:26px;background:var(--gn);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.c-div{width:1px;height:16px;background:#2A2A27;flex-shrink:0}
+.c-title{color:#777;font-size:10px;flex-shrink:0;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-badge{font-size:8px;color:#444;padding:2px 6px;border-radius:8px;border:1px solid #2A2A27;white-space:nowrap}
+.c-tabs{display:flex;gap:3px;flex-wrap:wrap;flex:1}
+.c-grp{font-size:8px;font-weight:700;color:#444;align-self:center;padding:0 3px;letter-spacing:.06em;white-space:nowrap}
+.sp{padding:3px 8px;font-size:10px;font-weight:600;border-radius:16px;border:1px solid #2A2A27;background:transparent;color:#666;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
+.sp:hover{background:#222;color:#ccc}
+.sp.st.on{background:var(--gn);color:#fff;border-color:var(--gn)}
+.sp.at.on{background:var(--pu);color:#fff;border-color:var(--pu)}
+/* ── Screens ── */
+.screen{display:none;min-height:calc(100vh - 44px)}
+.screen.on{display:flex}
+.layout{display:flex;width:100%;min-height:calc(100vh - 44px)}
+.login-wrap{width:100%;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:40px;min-height:calc(100vh - 44px)}
+/* ── Sidebar ── */
+.sb{width:210px;min-width:210px;background:var(--sb);display:flex;flex-direction:column;flex-shrink:0}
+.sb-brand{padding:14px 13px 11px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #222}
+.sb-logo{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-logo.st{background:var(--gn)}.sb-logo.at{background:var(--pu)}
+.sb-nm{color:#fff;font-size:12px;font-weight:700}
+.sb-sub{font-size:10px;margin-top:1px}
+.sb-sub.st{color:#0A5F43}.sb-sub.at{color:#6B63D4}
+.sb-nav{padding:8px 7px;flex:1}
+.sblbl{font-size:8px;letter-spacing:.1em;color:#3A3A37;padding:0 8px;margin:10px 0 3px;text-transform:uppercase;font-weight:700}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;color:var(--sbt);margin-bottom:1px;font-size:11px;font-weight:500;cursor:pointer;transition:background .1s}
+.ni:hover{background:var(--sbh);color:#ccc}
+.ni.on{background:var(--sbh);color:#fff}
+.ni-ic{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ni-b{margin-left:auto;background:#DC2626;color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px}
+.sb-foot{padding:7px;border-top:1px solid #222}
+.urow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;cursor:pointer}
+.urow:hover{background:#1C1C1A}
+.ava{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.av-st{background:var(--gn);color:#B7F0D6}.av-at{background:var(--pu);color:#C4BCE8}.av-df{background:#333;color:#888}
+.un{font-size:11px;font-weight:600;color:#fff}
+.ur{font-size:9px}
+/* ── Main ── */
+.main{flex:1;padding:20px 22px;overflow:auto;min-width:0}
+.ptitle{font-size:18px;font-weight:700;margin-bottom:3px}
+.psub{font-size:12px;color:var(--t2);margin-bottom:18px}
+.bc{font-size:11px;color:var(--t3);margin-bottom:9px;cursor:pointer}
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh)}
+.cth{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ctitle{font-size:12px;font-weight:700}
+/* ── Metrics ── */
+.mg{display:grid;gap:9px;margin-bottom:16px}
+.mc{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh)}
+.mcl{font-size:10px;color:var(--t2);margin-bottom:3px;font-weight:500}
+.mcv{font-size:24px;font-weight:700;line-height:1}
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:var(--card);color:var(--t1);font-family:'Inter',sans-serif;transition:all .12s;white-space:nowrap}
+.btn:hover{background:#F7F5F1;border-color:#ccc}
+.btn-p{background:#111110;color:#fff;border-color:#111110}.btn-p:hover{background:#1f1f1d}
+.btn-g{background:var(--gn);color:#fff;border-color:var(--gn)}.btn-g:hover{background:#0c6e4c}
+.btn-pu{background:var(--pu);color:#fff;border-color:var(--pu)}
+.btn-am{background:var(--aml);color:var(--am);border-color:var(--amb)}
+.btn-rd{background:var(--rdl);color:var(--rd);border-color:var(--rdb)}
+.btn-bl{background:var(--bll);color:var(--bl);border-color:var(--blb)}
+.btn-sm{padding:5px 9px;font-size:10px}
+.bg{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:16px}
+.b-sent{background:var(--gnl);color:var(--gn);border:1px solid var(--gnb)}
+.b-pend{background:var(--aml);color:var(--am);border:1px solid var(--amb)}
+.b-proc{background:var(--bll);color:var(--bl);border:1px solid var(--blb)}
+.b-fail{background:var(--rdl);color:var(--rd);border:1px solid var(--rdb)}
+.b-ann{background:var(--pul);color:var(--pu);border:1px solid var(--pub)}
+.b-aer{background:var(--pul);color:var(--pu);border:1px solid var(--pub)}
+.b-ext{background:var(--gnl);color:var(--gn);border:1px solid var(--gnb)}
+.b-int{background:var(--bll);color:var(--bl);border:1px solid var(--blb)}
+.b-neu{background:#F1EDE6;color:#6B6660}
+.b-adm{background:var(--pul);color:var(--pu)}
+.b-stf{background:var(--gnl);color:var(--gn)}
+.b-rep{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+/* ── Alerts ── */
+.alert{border-radius:9px;padding:10px 13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:9px;font-size:11px}
+.a-ok{background:var(--gnl);border:1px solid var(--gnb);color:var(--gn)}
+.a-wn{background:var(--aml);border:1px solid var(--amb);color:var(--am)}
+.a-er{background:var(--rdl);border:1px solid var(--rdb);color:var(--rd)}
+.a-in{background:var(--bll);border:1px solid var(--blb);color:var(--bl)}
+.a-ic{font-size:15px;flex-shrink:0;margin-top:1px}
+.a-ti{font-weight:700;margin-bottom:2px}
+/* ── Tables ── */
+.tbl{border-radius:var(--r);overflow:hidden;border:1px solid var(--bd);box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:9px 13px;font-size:10px;font-weight:700;color:var(--t2);background:#F9F7F4;border-bottom:1px solid var(--bd)}
+td{padding:10px 13px;border-bottom:1px solid #F5F1EB;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FDFBF8}
+/* ── Image placeholders ── */
+.ph-aer{background:linear-gradient(160deg,#5A7F5A,#7A9F6A,#8AAF7A,#6A8F5A)}
+.ph-ext{background:linear-gradient(180deg,#87CEEB 45%,#C8B89A 45%,#B8A88A)}
+.ph-int{background:linear-gradient(135deg,#FFF8F0,#F5E6D0,#E8D5B7)}
+.ph-pool{background:linear-gradient(160deg,#006994,#0088B2,#00A0CC)}
+.ph-ai{background:linear-gradient(135deg,#87CEEB,#A0D8EF 30%,#7A9F6A,#8AAF7A);filter:saturate(1.2) brightness(1.05)}
+.ph-gen{background:linear-gradient(135deg,#E8E4DC,#D8D4CC)}
+.ph-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.4))}
+/* ── Image grid & cards ── */
+.igrid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.icard{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.icard:hover{border-color:#bbb;box-shadow:var(--shm);transform:translateY(-1px)}
+.ith{height:100px;position:relative;overflow:hidden}
+.ith-sm{height:78px}
+.iinf{padding:9px 10px}
+.inm{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.ipr{font-size:9px;color:var(--t2);margin-bottom:5px}
+.ibt{display:flex;align-items:center;justify-content:space-between}
+.ian{font-size:9px;color:var(--t3);margin-top:3px}
+/* ── Listing rows ── */
+.lrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F5F1EB;cursor:pointer}
+.lrow:last-child{border-bottom:none}
+.lrow:hover .lnm{color:var(--gn)}
+.lic{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--bd)}
+.lnm{font-size:12px;font-weight:600;transition:.1s}
+.lmeta{font-size:10px;color:var(--t2);margin-top:2px}
+/* ── Upload options ── */
+.uopt{border:2px solid var(--bd);border-radius:12px;padding:18px;flex:1;cursor:pointer;transition:all .15s;background:var(--card)}
+.uopt:hover{border-color:#aaa}
+.uopt.sel{border-color:var(--gn);background:#FDFFFE}
+/* ── Filters ── */
+.ftabs{display:flex;gap:3px;background:#F1EDE6;padding:3px;border-radius:8px}
+.ftab{padding:5px 12px;font-size:10px;font-weight:600;cursor:pointer;border-radius:5px;color:var(--t2);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .12s}
+.ftab.on{background:#fff;color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* ── Activity log ── */
+.ai{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #F5F1EB;font-size:11px;align-items:flex-start}
+.ai:last-child{border-bottom:none}
+.ad{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.am{font-size:9px;color:var(--t3);margin-top:2px}
+/* ── Search ── */
+.srch{position:relative;flex:1}
+.srch input{padding-left:32px}
+.sic{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:#bbb}
+/* ── Toggles ── */
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--card);border:1px solid var(--bd);border-radius:8px}
+.tw{width:36px;height:20px;border-radius:10px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.tw.on{background:var(--gn)}.tw.off{background:#ccc}
+.tw-dot{position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+.tw.on .tw-dot{left:19px}.tw.off .tw-dot{left:3px}
+/* ── Batch review specific ── */
+.br-top{background:var(--card);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.br-prog{flex:1;min-width:200px}
+.br-bar{height:6px;background:#F1EDE6;border-radius:3px;margin-top:5px;overflow:hidden}
+.br-fill{height:100%;background:var(--gn);border-radius:3px;transition:width .3s}
+.br-main{display:flex;gap:14px;padding:14px 20px;flex:1;overflow:hidden}
+.br-img-panel{flex:1;min-width:0}
+.br-side{width:220px;min-width:220px;display:flex;flex-direction:column;gap:10px}
+.ba-lbl{font-size:9px;font-weight:700;letter-spacing:.07em;color:var(--t2);text-align:center;margin-bottom:6px}
+.ba-img{border-radius:var(--r);overflow:hidden;border:1.5px solid var(--bd);height:220px;display:flex;align-items:center;justify-content:center;position:relative}
+.br-strip{height:76px;background:var(--card);border-top:1px solid var(--bd);display:flex;gap:6px;padding:8px 14px;overflow-x:auto;align-items:center}
+.tsi{width:58px;min-width:58px;height:58px;border-radius:7px;border:2px solid transparent;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;transition:all .12s}
+.tsi.cur{border-color:var(--bl)}.tsi:hover{border-color:#aaa}
+.tsi-ok{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--gn);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff}
+.tsi-sk{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--am);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff}
+/* ── Notes panel ── */
+.notes-panel{position:fixed;right:0;top:44px;width:340px;height:calc(100vh - 44px);background:var(--card);border-left:1px solid var(--bd);box-shadow:-4px 0 20px rgba(0,0,0,.1);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s}
+.notes-panel.open{transform:translateX(0)}
+.np-head{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.np-body{flex:1;overflow-y:auto;padding:14px 16px}
+.np-note{background:var(--aml);border:1px solid var(--amb);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--am);line-height:1.5}
+/* ── Canvas ── */
+.canvas-wrap{display:flex;flex-direction:column;width:100%;min-height:calc(100vh - 44px)}
+.ctop{padding:10px 15px;background:var(--sb);border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;flex-shrink:0}
+.ctop-l p:first-child{font-size:9px;color:#666;margin-bottom:2px}
+.ctop-l p:last-child{font-size:13px;font-weight:700;color:#fff}
+.ctool{display:flex;gap:3px;padding:7px 11px;background:#1E1E1B;border-bottom:1px solid #2A2A27;flex-wrap:wrap;align-items:center;flex-shrink:0}
+.tbn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid #333;background:transparent;color:#888;font-family:'Inter',sans-serif;transition:all .1s}
+.tbn:hover{background:#2A2A27;color:#ccc}
+.tbn.on{background:#2A2A27;color:#fff;border-color:#555}
+.tbn.lot{background:rgba(61,50,176,.2);color:#8B7EE8;border-color:rgba(61,50,176,.4)}
+.tbn.pin{background:rgba(185,94,30,.2);color:#E4945A;border-color:rgba(185,94,30,.4)}
+.tbn.crop{background:rgba(220,38,38,.15);color:#EF4444;border-color:rgba(220,38,38,.35)}
+.csp{padding:7px 13px;border-bottom:1px solid #252522;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+.csp-lot{background:rgba(61,50,176,.08)}.csp-pin{background:rgba(185,94,30,.08)}.csp-crop{background:rgba(220,38,38,.05)}
+.spi label{display:block;font-size:8px;color:#777;margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.spi select,.spi input[type=text]{font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:5px;background:#1A1A18;color:#ddd;font-family:'Inter',sans-serif;width:auto}
+.spi input[type=range]{width:65px}
+.sw{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0}
+.sw.on{border-color:#fff}
+.cbody{display:flex;flex:1;overflow:hidden;min-height:260px}
+.cimg{flex:1;position:relative;overflow:hidden}
+.crt{width:185px;min-width:185px;background:#1A1A18;border-left:1px solid #252522;display:flex;flex-direction:column}
+.crh{padding:8px 11px;border-bottom:1px solid #252522;font-size:10px;font-weight:700;color:#666;background:#141412;letter-spacing:.05em}
+.lyr{display:flex;align-items:center;gap:7px;padding:8px 11px;border-bottom:1px solid #222;cursor:pointer;font-size:11px;color:#999}
+.lyr:hover{background:#1E1E1B;color:#fff}
+.ldot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.tstrip{height:80px;background:#141412;border-top:1px solid #252522;display:flex;gap:6px;padding:9px 13px;overflow-x:auto;align-items:center;flex-shrink:0}
+/* ── Login ── */
+.lcard{width:370px;background:var(--card);border-radius:16px;padding:34px 30px;box-shadow:0 8px 32px rgba(0,0,0,.1);border:1px solid var(--bd)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--t2);margin-bottom:4px}
+/* ── End of batch ── */
+.eob{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 44px);background:var(--bg);padding:40px}
+.eob-card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:36px;max-width:560px;width:100%;box-shadow:var(--shm);text-align:center}
+/* ── Voice button ── */
+.voice-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600;border:1px solid var(--rdb);background:var(--rdl);color:var(--rd);cursor:pointer;font-family:'Inter',sans-serif}
+.voice-btn.rec{background:var(--rd);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+/* ── Dropdown menu ── */
+.dd-wrap{position:relative;display:inline-block}
+.dd-menu{position:absolute;top:calc(100% + 3px);left:0;background:var(--card);border:1px solid var(--bd);border-radius:9px;box-shadow:var(--shm);min-width:190px;z-index:50;overflow:hidden;display:none}
+.dd-menu.open{display:block}
+.dd-item{padding:9px 13px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #F5F1EB}
+.dd-item:last-child{border-bottom:none}
+.dd-item:hover{background:var(--bg)}
+/* ── Misc ── */
+.wf-note{font-size:9px;color:var(--t3);font-style:italic;margin-top:6px}
+.dtl-g{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dtl-r{display:flex;padding:6px 0;border-bottom:1px solid #F5F1EB}
+.dtl-r:last-child{border-bottom:none}
+.dtl-l{font-size:10px;color:var(--t2);width:120px;flex-shrink:0;font-weight:500}
+.dtl-v{font-size:10px;font-weight:600}
+.ph-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--bll);color:var(--bl);border:1px solid var(--blb);border-radius:12px;font-size:10px;font-weight:600;margin:2px}
+.model-card{border:2px solid var(--bd);border-radius:9px;padding:14px;cursor:pointer;transition:all .15s;background:var(--card)}
+.model-card:hover{border-color:#aaa}
+.model-card.sel{border-color:var(--gn);background:var(--gnl)}
+.proc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F1EB}
+.proc-row:last-child{border-bottom:none}
+.proc-th{width:44px;height:44px;border-radius:7px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ══ CHROME ══ -->
+<div class="chrome">
+  <div class="c-logo"><div class="c-dot">✦</div>AI Photo Platform</div>
+  <div class="c-div"></div>
+  <div class="c-title" id="c-title">Staff Login</div>
+  <div class="c-badge">SOW v1.1</div>
+  <div class="c-tabs">
+    <span class="c-grp">STAFF</span>
+    <button class="sp st on" data-s="st-login"    onclick="go('st-login')">Login</button>
+    <button class="sp st"    data-s="st-dash"     onclick="go('st-dash')">Dashboard</button>
+    <button class="sp st"    data-s="st-listings" onclick="go('st-listings')">Select Listing</button>
+    <button class="sp st"    data-s="st-create"   onclick="go('st-create')">Create Listing</button>
+    <button class="sp st"    data-s="st-detail"   onclick="go('st-detail')">Listing Detail</button>
+    <button class="sp st"    data-s="st-upload"   onclick="go('st-upload')">Upload Options</button>
+    <button class="sp st"    data-s="st-gallery"  onclick="go('st-gallery')">Gallery Picker</button>
+    <button class="sp st"    data-s="st-manual"   onclick="go('st-manual')">Manual Upload</button>
+    <button class="sp st"    data-s="st-proc"     onclick="go('st-proc')">AI Processing</button>
+    <button class="sp st"    data-s="st-review"   onclick="go('st-review')">Batch Review</button>
+    <button class="sp st"    data-s="st-eob"      onclick="go('st-eob')">End of Batch</button>
+    <button class="sp st"    data-s="st-reprompt" onclick="go('st-reprompt')">Re-prompt</button>
+    <button class="sp st"    data-s="st-canvas"   onclick="go('st-canvas')">Annotation Canvas</button>
+    <button class="sp st"    data-s="st-history"  onclick="go('st-history')">History</button>
+    <span class="c-grp" style="margin-left:6px">ADMIN</span>
+    <button class="sp at" data-s="ad-login"   onclick="go('ad-login')">Login</button>
+    <button class="sp at" data-s="ad-dash"    onclick="go('ad-dash')">Dashboard</button>
+    <button class="sp at" data-s="ad-users"   onclick="go('ad-users')">Users</button>
+    <button class="sp at" data-s="ad-useradd" onclick="go('ad-useradd')">Add User</button>
+    <button class="sp at" data-s="ad-listings"onclick="go('ad-listings')">Listings</button>
+    <button class="sp at" data-s="ad-media"   onclick="go('ad-media')">Media</button>
+    <button class="sp at" data-s="ad-prompt"  onclick="go('ad-prompt')">Prompt+Model</button>
+    <button class="sp at" data-s="ad-logs"    onclick="go('ad-logs')">Activity Logs</button>
+  </div>
+</div>
+
+<!-- ══ Aryeo Notes Panel (global overlay) ══ -->
+<div class="notes-panel" id="notes-panel">
+  <div class="np-head">
+    <div><div style="font-size:12px;font-weight:700">📋 Customer Notes</div><div style="font-size:10px;color:var(--t2)">103 Oak Street · From Aryeo</div></div>
+    <button class="btn btn-sm" onclick="toggleNotes()">✕ Close</button>
+  </div>
+  <div class="np-body">
+    <div style="font-size:10px;font-weight:700;color:var(--t2);margin-bottom:8px;letter-spacing:.04em">LISTING-LEVEL NOTES</div>
+    <div class="np-note"><b>Sky replacement preference:</b> Client prefers a dramatic twilight sky with warm amber tones for exterior shots. Avoid pure blue skies.</div>
+    <div class="np-note"><b>Lot line colour:</b> Client uses amber (#E5A823) for all lot outline annotations — please use this consistently.</div>
+    <div class="np-note"><b>Pool:</b> Extra vibrant blue preferred. Client has noted past batches were not blue enough.</div>
+    <div style="font-size:10px;font-weight:700;color:var(--t2);margin-bottom:8px;margin-top:14px;letter-spacing:.04em">IMAGE-LEVEL NOTES</div>
+    <div class="np-note" style="background:var(--bll);border-color:var(--blb);color:var(--bl)"><b>aerial_view.jpg:</b> Ensure the pool is fully visible and the lot boundary is clear. Client will use this for marketing materials.</div>
+    <div style="font-size:9px;color:var(--t3);margin-top:12px">Last fetched from Aryeo: 2 min ago · <span style="cursor:pointer;color:var(--gn);text-decoration:underline">Refresh</span></div>
+    <div class="wf-note">↑ Notes pulled from Aryeo API. Read-only. Future phase: colour/pin parameters from notes will pre-configure the annotation canvas defaults.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     STAFF SCREENS
+════════════════════════════════════════════════ -->
+
+<!-- S1: Staff Login -->
+<div id="s-st-login" class="screen on">
+  <div class="login-wrap">
+    <div class="lcard">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:22px">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--gn);display:flex;align-items:center;justify-content:center;font-size:17px">✦</div>
+        <div><div style="font-size:14px;font-weight:700">AI Photo Platform</div><div style="font-size:10px;color:#999">Staff Portal</div></div>
+      </div>
+      <h2 style="font-size:19px;font-weight:700;margin-bottom:3px">Welcome back</h2>
+      <p style="font-size:11px;color:#888;margin-bottom:20px">Sign in to your staff account</p>
+      <div class="field"><label>Email address</label><input type="email" placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input type="password" placeholder="••••••••"></div>
+      <div class="alert a-er" style="margin-bottom:10px"><span class="a-ic">⚠</span><div><div class="a-ti">Invalid credentials</div>Check your email and password.</div></div>
+      <p class="wf-note" style="margin-bottom:12px">↑ Error state — after a failed attempt</p>
+      <button class="btn btn-p" style="width:100%;justify-content:center;padding:10px;font-size:12px" onclick="go('st-dash')">Sign in →</button>
+      <p style="font-size:10px;color:#aaa;text-align:center;margin-top:14px">No self-registration · Admin creates accounts · Admin panel is at a separate URL</p>
+    </div>
+  </div>
+</div>
+
+<!-- S2: Staff Dashboard -->
+<div id="s-st-dash" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-dash"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">My Dashboard</div>
+      <div class="psub">Your jobs, processing status, and delivery summary</div>
+      <div class="mg g3">
+        <div class="mc"><div class="mcl">My listings</div><div class="mcv">8</div></div>
+        <div class="mc"><div class="mcl">Pending review</div><div class="mcv" style="color:var(--am)">5</div></div>
+        <div class="mc"><div class="mcl">Sent to Aryeo</div><div class="mcv" style="color:var(--gn)">43</div></div>
+      </div>
+      <div class="igrid g2">
+        <div class="card"><div class="ctitle" style="margin-bottom:10px">Quick actions</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <button class="btn btn-p" style="justify-content:flex-start;padding:10px 13px" onclick="go('st-listings')">✦ Start editing — select a listing</button>
+            <button class="btn" style="justify-content:flex-start;padding:10px 13px" onclick="go('st-history')">📋 Continue reviewing pending (5)</button>
+          </div>
+        </div>
+        <div class="card"><div class="ctitle" style="margin-bottom:10px">Recent activity</div>
+          <div class="ai"><div class="ad" style="background:var(--gn)"></div><div style="flex:1"><div>8 images sent to Aryeo — <b>103 Oak Street</b></div><div class="am">20 min ago</div></div><span class="badge b-sent">Sent</span></div>
+          <div class="ai"><div class="ad" style="background:var(--pu)"></div><div style="flex:1"><div>Annotations saved — <b>aerial_view.jpg</b></div><div class="am">45 min ago</div></div><span class="badge b-ann">Annotated</span></div>
+          <div class="ai"><div class="ad" style="background:var(--bl)"></div><div style="flex:1"><div>AI complete — 6 images ready for review</div><div class="am">1 hr ago</div></div><span class="badge b-proc">Ready</span></div>
+          <div class="ai"><div class="ad" style="background:#666"></div><div style="flex:1"><div>Imported 4 images from DeVore Gallery</div><div class="am">2 hr ago</div></div><span class="badge b-neu">Queued</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: Select Listing -->
+<div id="s-st-listings" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-listings"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Select a listing</div>
+      <div class="psub">Search for an existing listing, or create a new one to start uploading</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div class="srch"><span class="sic">🔍</span><input type="text" placeholder="Search by listing name, address, order number, or Aryeo listing ID…"></div>
+        <button class="btn btn-g" onclick="go('st-create')">+ New listing</button>
+      </div>
+      <div class="alert a-in" style="margin-bottom:12px"><span class="a-ic">🌐</span><div><b>Listings are global</b> — all staff can see and open any listing regardless of who created it.</div></div>
+      <p style="font-size:10px;font-weight:700;color:#999;margin-bottom:9px;letter-spacing:.05em">RECENT LISTINGS</p>
+      <div class="card">
+        <div class="lrow" onclick="go('st-detail')">
+          <div class="lic ph-ext" style="background:linear-gradient(135deg,#87CEEB 45%,#C8B89A 45%)"></div>
+          <div style="flex:1;min-width:0">
+            <div class="lnm">103 Oak Street</div>
+            <div class="lmeta">Order #2024-441 · Listing #4821 · 12 images · Photographer: James B.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+            <span class="badge b-pend">5 pending</span>
+            <span style="font-size:10px;color:#bbb">Today</span>
+            <button class="btn btn-sm" onclick="go('st-detail')">Open →</button>
+          </div>
+        </div>
+        <div class="lrow" onclick="go('st-detail')">
+          <div class="lic" style="background:linear-gradient(135deg,#6B8F6B,#7A9A7A)"></div>
+          <div style="flex:1;min-width:0">
+            <div class="lnm">55 Elm Avenue</div>
+            <div class="lmeta">Order #2024-438 · Listing #4788 · 6 images · All delivered</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+            <span class="badge b-sent">Complete</span>
+            <span style="font-size:10px;color:#bbb">Yesterday</span>
+            <button class="btn btn-sm">Open →</button>
+          </div>
+        </div>
+        <div class="lrow" style="border-bottom:none">
+          <div class="lic ph-int" style="background:linear-gradient(135deg,#FFF8F0,#E8D5B7)"></div>
+          <div style="flex:1;min-width:0">
+            <div class="lnm">12 Pine Road</div>
+            <div class="lmeta">Order #2024-436 · No listing ID · Processing</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+            <span class="badge b-proc">Processing</span>
+            <span style="font-size:10px;color:#bbb">2 hr ago</span>
+            <button class="btn btn-sm">Open →</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:#FDFBF8;display:flex;align-items:center;justify-content:space-between">
+        <div><p style="font-weight:700;margin-bottom:2px;font-size:12px">Can't find the listing?</p><p style="font-size:11px;color:#888">Create a new listing and start uploading images</p></div>
+        <button class="btn btn-p" onclick="go('st-create')">+ Create new listing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: Create Listing -->
+<div id="s-st-create" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-create"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-listings')">← Select listing</div>
+      <div class="ptitle">Create New Listing</div>
+      <div class="psub">All images for this listing will be grouped here as one batch</div>
+      <div class="card" style="max-width:540px">
+        <div class="field"><label>Listing name <span style="color:var(--rd)">*</span></label><input type="text" placeholder="e.g. 103 Oak Street"></div>
+        <div class="field"><label>Address <span style="color:var(--rd)">*</span></label><input type="text" placeholder="e.g. 103 Oak Street, Austin TX 78701"></div>
+        <div class="igrid g2" style="gap:10px;margin-bottom:12px">
+          <div class="field" style="margin-bottom:0"><label>Order number</label><input type="text" placeholder="e.g. 2024-441"></div>
+          <div class="field" style="margin-bottom:0"><label>Aryeo Listing ID</label><input type="text" placeholder="e.g. #4821"></div>
+        </div>
+        <div class="field">
+          <label>Photographer(s)</label>
+          <div style="display:flex;gap:7px;margin-bottom:7px">
+            <input type="text" placeholder="Type photographer name and press +" style="flex:1">
+            <button class="btn btn-sm">+ Add</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;min-height:28px;background:#FAFAF7;border:1px solid var(--bd);border-radius:7px;padding:5px 8px">
+            <div class="ph-tag">James B. <span style="cursor:pointer;margin-left:3px;opacity:.6">✕</span></div>
+            <div class="ph-tag">Sarah K. <span style="cursor:pointer;margin-left:3px;opacity:.6">✕</span></div>
+            <span style="font-size:10px;color:var(--t3);align-self:center">Multiple photographers allowed</span>
+          </div>
+        </div>
+        <div style="background:#F5F3EF;border-radius:7px;padding:9px 12px;font-size:10px;color:var(--t2);margin-bottom:14px">Auto-populated: Created by <b>Mark Smith</b> · Date <b>Today</b></div>
+        <div class="bg">
+          <button class="btn btn-g" onclick="go('st-detail')">Create listing →</button>
+          <button class="btn" onclick="go('st-listings')">Cancel</button>
+        </div>
+      </div>
+      <p class="wf-note">↑ After creation, user lands on Listing Detail — not Upload directly. Photographer info is tracked for accountability. Multiple photographers supported per listing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5: Listing Detail -->
+<div id="s-st-detail" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-detail"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-listings')">← Select listing</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:9px">
+        <div>
+          <div class="ptitle" style="margin-bottom:2px">103 Oak Street</div>
+          <div style="font-size:11px;color:#888">Order #2024-441 · Listing #4821 · Austin TX 78701</div>
+        </div>
+        <div class="bg">
+          <button class="btn">📋 Aryeo notes</button>
+          <button class="btn">✎ Edit</button>
+          <button class="btn btn-p" onclick="go('st-upload')">⬆ Upload images</button>
+        </div>
+      </div>
+      <!-- Photographers card -->
+      <div class="card" style="padding:10px 14px;margin-bottom:10px;background:#F9F8FF">
+        <div style="font-size:10px;font-weight:700;color:var(--pu);margin-bottom:5px">📸 PHOTOGRAPHERS</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <div class="ph-tag">James B.</div>
+          <div class="ph-tag">Sarah K.</div>
+        </div>
+        <p class="wf-note">↑ Photographers tracked for accountability — trace images back to source if issues arise</p>
+      </div>
+      <div class="mg g4" style="margin-bottom:12px">
+        <div class="mc"><div class="mcl">Total images</div><div class="mcv">12</div></div>
+        <div class="mc"><div class="mcl">Pending review</div><div class="mcv" style="color:var(--am)">5</div></div>
+        <div class="mc"><div class="mcl">Sent to Aryeo</div><div class="mcv" style="color:var(--gn)">7</div></div>
+        <div class="mc"><div class="mcl">Processing</div><div class="mcv" style="color:var(--bl)">0</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-g" onclick="go('st-review')">▶ Start batch review (5 pending)</button>
+        <div class="ftabs"><button class="ftab on">All (12)</button><button class="ftab">Pending (5)</button><button class="ftab">Sent (7)</button></div>
+        <div class="ftabs"><button class="ftab on">All types</button><button class="ftab">Exterior</button><button class="ftab">Interior</button><button class="ftab">Aerial</button></div>
+      </div>
+      <div class="igrid g3">
+        <div class="icard" onclick="go('st-review')"><div class="ith ph-aer"><div class="ph-ov"></div><div style="position:absolute;top:6px;left:6px;right:6px;display:flex;justify-content:space-between"><span class="badge b-aer">Aerial</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">aerial_view.jpg</div><div class="ipr">James B. · Today</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">10:47</span></div><div class="ian">1 lot outline · 2 pins</div></div></div>
+        <div class="icard" onclick="go('st-review')"><div class="ith ph-pool"><div class="ph-ov"></div><div style="position:absolute;top:6px;left:6px;right:6px;display:flex;justify-content:space-between"><span class="badge b-ext">Exterior</span><span class="badge b-pend">Pending</span></div></div><div class="iinf"><div class="inm">pool_area.jpg</div><div class="ipr">James B. · Today</div><div class="ibt"><span class="badge b-pend">Pending</span><span style="font-size:9px;color:#bbb">10:48</span></div></div></div>
+        <div class="icard"><div class="ith ph-int"><div class="ph-ov"></div><div style="position:absolute;top:6px;left:6px;right:6px;display:flex;justify-content:space-between"><span class="badge b-int">Interior</span><span class="badge b-pend">Pending</span></div></div><div class="iinf"><div class="inm">kitchen_wide.jpg</div><div class="ipr">Sarah K. · Today</div><div class="ibt"><span class="badge b-pend">Pending</span><span style="font-size:9px;color:#bbb">10:49</span></div></div></div>
+        <div class="icard"><div class="ith ph-int"><div class="ph-ov"></div><div style="position:absolute;top:6px;left:6px;right:6px;display:flex;justify-content:space-between"><span class="badge b-int">Interior</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">living_room.jpg</div><div class="ipr">James B. · Yesterday</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Yday</span></div></div></div>
+        <div class="icard"><div class="ith ph-ext"><div class="ph-ov"></div><div style="position:absolute;top:6px;left:6px;right:6px;display:flex;justify-content:space-between"><span class="badge b-ext">Exterior</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">exterior_front.jpg</div><div class="ipr">James B. · Yesterday</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Yday</span></div></div></div>
+        <div onclick="go('st-upload')" style="border:2px dashed var(--bd);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;cursor:pointer;padding:18px;text-align:center;transition:.15s;min-height:160px" onmouseover="this.style.borderColor='#aaa'" onmouseout="this.style.borderColor='var(--bd)'">
+          <span style="font-size:24px;opacity:.35">⬆</span><p style="font-size:11px;font-weight:600;color:#888">Upload more images</p><p style="font-size:10px;color:#bbb">Add to this listing</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: Upload Options -->
+<div id="s-st-upload" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-upload"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-detail')">← 103 Oak Street</div>
+      <div class="ptitle">Upload Images</div>
+      <div class="psub">Adding to: <b>103 Oak Street</b> · Order #2024-441 · AI processing starts automatically</div>
+      <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="uopt sel" style="cursor:pointer" onclick="go('st-gallery')">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
+            <div style="width:44px;height:44px;border-radius:11px;background:var(--gn);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏛</div>
+            <div><div style="font-size:13px;font-weight:700">DeVore Gallery</div><div style="font-size:10px;color:#888;margin-top:1px">Import from Aryeo API</div></div>
+            <div style="margin-left:auto;width:16px;height:16px;border-radius:50%;background:var(--gn);display:flex;align-items:center;justify-content:center"><div style="width:6px;height:6px;border-radius:50%;background:#fff"></div></div>
+          </div>
+          <p style="font-size:11px;color:#666;margin-bottom:12px;line-height:1.5">Browse Aryeo-connected listing folders and select images. Toggles available at import.</p>
+          <button class="btn btn-p" onclick="go('st-gallery')">Browse DeVore Gallery →</button>
+        </div>
+        <div class="uopt" onclick="go('st-manual')">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
+            <div style="width:44px;height:44px;border-radius:11px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📁</div>
+            <div><div style="font-size:13px;font-weight:700">Manual Upload</div><div style="font-size:10px;color:#888;margin-top:1px">Upload from your device</div></div>
+            <div style="margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid #ddd"></div>
+          </div>
+          <p style="font-size:11px;color:#666;margin-bottom:12px;line-height:1.5">Upload JPG, PNG or RAW files from your computer. Assign photographer and toggles per upload session.</p>
+          <button class="btn" onclick="go('st-manual')">Upload from device →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: Gallery Picker -->
+<div id="s-st-gallery" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-gallery"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-upload')">← Upload Options</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:9px">
+        <div><div class="ptitle">DeVore Gallery</div><div class="psub" style="margin-bottom:0">Select images to import · 103 Oak Street</div></div>
+        <button class="btn btn-p" onclick="go('st-proc')">Import selected (3) →</button>
+      </div>
+      <!-- AI Toggles -->
+      <div class="card" style="margin-bottom:12px;background:#F9F7F4">
+        <div class="cth"><span style="font-size:11px;font-weight:700">⚙ AI Enhancement Options</span><span style="font-size:10px;color:var(--t2)">Applied to all imported images</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">🌿 Greener grass</div><div style="font-size:10px;color:var(--t2)">Enhance lawn colour and vibrancy</div></div><div class="tw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">💧 Blue pool water</div><div style="font-size:10px;color:var(--t2)">Make pool and water vibrant blue</div></div><div class="tw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">📺 Add TV/PC screens</div><div style="font-size:10px;color:var(--t2)">Insert realistic screen content</div></div><div class="tw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+        </div>
+        <p class="wf-note">↑ Toggle state captured at import time. Stored per image_version. Can be changed on re-prompt.</p>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:12px"><div class="srch"><span class="sic">🔍</span><input type="text" placeholder="Search listings…"></div><button class="btn">⟳ Refresh from Aryeo</button></div>
+      <!-- Gallery grid -->
+      <div class="card" style="margin-bottom:9px">
+        <div class="cth"><div><div style="font-weight:700;font-size:12px">103 Oak Street · Listing #4821</div><div style="font-size:10px;color:#888;margin-top:2px">12 images · Active listing</div></div><button class="btn btn-sm">Select all</button></div>
+        <div class="igrid g4">
+          <div class="icard" style="border-color:var(--bl)"><div class="ith-sm ph-aer" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;background:var(--bl);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✓</div></div></div>
+          <div class="icard" style="border-color:var(--bl)"><div class="ith-sm ph-pool" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;background:var(--bl);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✓</div></div></div>
+          <div class="icard" style="border-color:var(--bl)"><div class="ith-sm ph-ext" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;background:var(--bl);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">✓</div></div></div>
+          <div class="icard"><div class="ith-sm ph-int" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6)"></div></div></div>
+          <div class="icard"><div class="ith-sm ph-int" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6)"></div></div></div>
+          <div class="icard"><div class="ith-sm ph-gen" style="position:relative"><div style="position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S8: Manual Upload -->
+<div id="s-st-manual" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-manual"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-upload')">← Upload Options</div>
+      <div class="ptitle">Manual Upload</div>
+      <div class="psub">Uploading to: <b>103 Oak Street</b> · JPG, PNG, RAW · Max 50 MB per file</div>
+      <!-- Photographer for this session -->
+      <div class="card" style="margin-bottom:10px">
+        <div class="cth"><span style="font-size:11px;font-weight:700">📸 Photographer for this upload</span></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select style="flex:1;font-size:11px"><option>James B.</option><option>Sarah K.</option><option>-- Other photographer --</option></select>
+          <input type="text" placeholder="Or type name…" style="flex:1;font-size:11px">
+        </div>
+        <p class="wf-note">↑ Applies to all images in this upload session. From Aryeo API: extracted from image metadata automatically.</p>
+      </div>
+      <!-- AI Toggles -->
+      <div class="card" style="margin-bottom:10px;background:#F9F7F4">
+        <div class="cth"><span style="font-size:11px;font-weight:700">⚙ AI Enhancement Options</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">🌿 Greener grass</div><div style="font-size:10px;color:var(--t2)">Enhance lawn colour</div></div><div class="tw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">💧 Blue pool water</div><div style="font-size:10px;color:var(--t2)">Vibrant blue pool</div></div><div class="tw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+          <div class="toggle"><div><div style="font-size:11px;font-weight:600">📺 Add TV/PC screens</div><div style="font-size:10px;color:var(--t2)">Insert screen content</div></div><div class="tw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tw-dot"></div></div></div>
+        </div>
+      </div>
+      <!-- Drop zone -->
+      <div style="border:2px dashed var(--bd);border-radius:11px;padding:28px;text-align:center;background:#FDFBF8;margin-bottom:12px;cursor:pointer">
+        <div style="font-size:28px;margin-bottom:8px;opacity:.4">☁</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px">Drag & drop images here</div>
+        <div style="font-size:11px;color:#888;margin-bottom:12px">JPG, PNG, RAW (CR2, NEF, ARW, DNG)</div>
+        <button class="btn btn-p" onclick="go('st-proc')">Browse files</button>
+      </div>
+      <!-- File list -->
+      <div class="card">
+        <div class="cth"><div class="ctitle">Selected files (3)</div><button class="btn btn-g" onclick="go('st-proc')">Upload all & start AI →</button></div>
+        <div class="proc-row"><div class="proc-th ph-ext"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">exterior_front.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px">4.2 MB · JPG · James B.</div></div><span class="badge b-sent">Ready</span><button class="btn btn-rd btn-sm" style="margin-left:6px">✕</button></div>
+        <div class="proc-row"><div class="proc-th ph-pool"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">pool_area.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px">5.1 MB · JPG · James B.</div></div><span class="badge b-sent">Ready</span><button class="btn btn-rd btn-sm" style="margin-left:6px">✕</button></div>
+        <div class="proc-row" style="border-bottom:none"><div class="proc-th ph-aer"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">aerial_shot.RAW</div><div style="font-size:10px;color:var(--t2);margin-top:2px">18.3 MB · RAW · James B.</div></div><span class="badge b-pend">Large file</span><button class="btn btn-rd btn-sm" style="margin-left:6px">✕</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S9: AI Processing -->
+<div id="s-st-proc" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-proc"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('st-detail')">← 103 Oak Street</div>
+      <div class="ptitle">AI Processing — 103 Oak Street</div>
+      <div class="psub">32 enhancements applied automatically · Toggle state applied per image</div>
+      <div class="mg g3" style="margin-bottom:12px">
+        <div class="mc"><div class="mcl">Total in batch</div><div class="mcv">6</div></div>
+        <div class="mc"><div class="mcl">Processing</div><div class="mcv" style="color:var(--bl)">3</div></div>
+        <div class="mc"><div class="mcl">Ready for review</div><div class="mcv" style="color:var(--gn)">3</div></div>
+      </div>
+      <div class="alert a-ok"><span class="a-ic">✓</span><div><div class="a-ti">3 images ready for review</div>Page updates automatically. When all complete, start batch review to approve and send all at once.</div></div>
+      <div style="margin-bottom:12px"><button class="btn btn-g" onclick="go('st-review')">▶ Start batch review (3 ready)</button></div>
+      <div class="card">
+        <div class="proc-row"><div class="proc-th ph-aer"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">aerial_view.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Gallery</span> 5.1 MB · 🌿 ON 💧 OFF 📺 OFF</div></div><div style="display:flex;align-items:center;gap:6px"><span class="badge b-sent">✓ AI complete</span><button class="btn btn-sm btn-g" onclick="go('st-review')">Review in batch →</button></div></div>
+        <div class="proc-row"><div class="proc-th ph-pool"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">pool_area.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Gallery</span> 4.8 MB · 🌿 ON 💧 ON 📺 OFF</div></div><div style="display:flex;align-items:center;gap:6px"><span class="badge b-sent">✓ AI complete</span></div></div>
+        <div class="proc-row"><div class="proc-th ph-ext"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">exterior_front.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Manual</span> 4.2 MB · 🌿 ON 💧 OFF 📺 OFF</div></div><div style="display:flex;align-items:center;gap:6px"><span class="badge b-sent">✓ AI complete</span></div></div>
+        <div class="proc-row"><div class="proc-th ph-int" style="animation:pulse 1.5s infinite"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">kitchen_wide.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Manual</span> 3.8 MB</div></div><span class="badge b-proc">⟳ Processing…</span></div>
+        <div class="proc-row"><div class="proc-th ph-int" style="animation:pulse 1.5s infinite"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">living_room.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Gallery</span> 3.2 MB</div></div><span class="badge b-proc">⟳ Processing…</span></div>
+        <div class="proc-row" style="border-bottom:none"><div class="proc-th ph-gen" style="opacity:.5"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">master_bedroom.jpg</div><div style="font-size:10px;color:var(--t2);margin-top:2px"><span class="badge b-neu" style="font-size:8px">Manual</span> 4.0 MB</div></div><div style="display:flex;align-items:center;gap:6px"><span class="badge b-fail">⚠ Failed</span><button class="btn btn-am btn-sm">Retry</button></div></div>
+      </div>
+      <p class="wf-note">↑ Toggle state shown per image (what was ON at upload time). "Start batch review" when ready to approve images sequentially and send all approved to Aryeo in one action.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S10: BATCH REVIEW ──────────────────────────────────── -->
+<div id="s-st-review" class="screen" style="flex-direction:column">
+  <!-- Progress bar top -->
+  <div class="br-top">
+    <div class="br-prog">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:700">Batch Review — 103 Oak Street</span>
+        <span style="font-size:11px;color:var(--t2)">Image <b id="br-cur">2</b> of <b>5</b> &nbsp;·&nbsp; <span style="color:var(--gn);font-weight:600">2 approved</span> &nbsp;·&nbsp; <span style="color:var(--am)">0 skipped</span></span>
+      </div>
+      <div class="br-bar"><div class="br-fill" id="br-fill" style="width:40%"></div></div>
+    </div>
+    <div class="bg">
+      <button class="btn" onclick="prevImg()">← Prev</button>
+      <button class="btn" onclick="nextImg()">Next →</button>
+      <button class="btn" onclick="toggleNotes()">📋 Notes</button>
+      <button class="btn btn-am" onclick="go('st-reprompt')">↺ Re-prompt</button>
+      <button class="btn btn-pu" onclick="go('st-canvas')">✏ Annotate</button>
+      <div class="dd-wrap">
+        <button class="btn" onclick="toggleDD('dl-dd')">⬇ Download ▾</button>
+        <div class="dd-menu" id="dl-dd">
+          <div class="dd-item" onclick="closeDD('dl-dd')">🖼 Download original</div>
+          <div class="dd-item" onclick="closeDD('dl-dd')">✨ Download AI edited</div>
+          <div class="dd-item" onclick="closeDD('dl-dd');showReplaceModal()">🔄 Replace this image</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main review area -->
+  <div class="br-main">
+    <div class="br-img-panel">
+      <div class="igrid g2" style="margin-bottom:10px">
+        <div>
+          <div class="ba-lbl">BEFORE — Original</div>
+          <div class="ba-img ph-gen"><span style="font-size:32px;opacity:.3">🖼</span><div style="position:absolute;bottom:8px;left:10px;font-size:9px;background:rgba(0,0,0,.5);color:#fff;padding:2px 8px;border-radius:4px">pool_area.jpg · Original</div></div>
+        </div>
+        <div>
+          <div class="ba-lbl">AFTER — AI Enhanced (V1) &nbsp;<span class="badge b-neu" style="font-size:8px">🌿ON 💧ON</span></div>
+          <div class="ba-img ph-ai" style="border-color:var(--gnb)"><span style="font-size:32px;opacity:.6">✨</span><div style="position:absolute;bottom:8px;left:10px;font-size:9px;background:rgba(0,0,0,.55);color:#fff;padding:2px 8px;border-radius:4px">AI output · pool_area.jpg</div></div>
+        </div>
+      </div>
+      <!-- Approve / Skip buttons - prominent -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn btn-g" style="justify-content:center;padding:12px;font-size:13px" onclick="approveImg()">✓ Approve this image</button>
+        <button class="btn btn-am" style="justify-content:center;padding:12px;font-size:13px" onclick="skipImg()">↩ Skip — review later</button>
+      </div>
+      <p class="wf-note" style="text-align:center;margin-top:6px">Approving does not send to Aryeo yet — all approved images are sent together at the end of the batch</p>
+    </div>
+    <!-- Side panel -->
+    <div class="br-side">
+      <div class="card" style="margin-bottom:0">
+        <div class="ctitle" style="margin-bottom:8px">pool_area.jpg</div>
+        <div class="dtl-r"><div class="dtl-l">Listing</div><div class="dtl-v">103 Oak Street</div></div>
+        <div class="dtl-r"><div class="dtl-l">Type</div><div class="dtl-v"><span class="badge b-ext">Exterior</span></div></div>
+        <div class="dtl-r"><div class="dtl-l">Source</div><div class="dtl-v">DeVore Gallery</div></div>
+        <div class="dtl-r"><div class="dtl-l">Photographer</div><div class="dtl-v">James B.</div></div>
+        <div class="dtl-r"><div class="dtl-l">AI version</div><div class="dtl-v">V1</div></div>
+        <div class="dtl-r" style="border-bottom:none"><div class="dtl-l">Toggles</div><div class="dtl-v">🌿 ON · 💧 ON</div></div>
+      </div>
+      <div style="background:var(--aml);border:1px solid var(--amb);border-radius:8px;padding:10px 12px;font-size:10px;color:var(--am)">
+        <div style="font-weight:700;margin-bottom:4px">📋 Aryeo note</div>
+        Extra vibrant blue preferred — client noted past batches were not blue enough.
+        <div style="margin-top:6px;cursor:pointer;text-decoration:underline" onclick="toggleNotes()">View all notes →</div>
+      </div>
+    </div>
+  </div>
+  <!-- Thumbnail strip -->
+  <div class="br-strip">
+    <span style="font-size:9px;color:#aaa;font-weight:700;flex-shrink:0;margin-right:4px">BATCH</span>
+    <div class="tsi ph-aer"><div class="tsi-ok">✓</div></div>
+    <div class="tsi sel ph-pool cur"><div style="position:absolute;inset:0;border:2px solid var(--bl);border-radius:7px"></div></div>
+    <div class="tsi ph-ext"></div>
+    <div class="tsi ph-int"></div>
+    <div class="tsi ph-int"></div>
+    <span style="font-size:9px;color:#555;margin-left:8px;white-space:nowrap">✓ = approved &nbsp; ↩ = skipped &nbsp; Click to jump to image</span>
+  </div>
+</div>
+
+<!-- Replace Image Modal (hidden by default) -->
+<div id="replace-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center">
+  <div style="width:480px;background:var(--card);border-radius:14px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.2);border:1px solid var(--bd)">
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px">🔄 Replace this image</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:16px">pool_area.jpg · Download, edit on desktop, then re-upload here to replace the AI version</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="border:1.5px dashed var(--bd);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:#FAFAF8">
+        <div style="font-size:24px;margin-bottom:7px;opacity:.4">⬆</div>
+        <p style="font-size:11px;font-weight:600;margin-bottom:3px">Upload replacement</p>
+        <p style="font-size:10px;color:#aaa">JPG or PNG · Max 50 MB</p>
+      </div>
+      <div>
+        <div style="background:var(--gnl);border:1px solid var(--gnb);border-radius:8px;padding:10px;font-size:10px;color:var(--gn);margin-bottom:8px">✓ Original image is always preserved. Only the display version is replaced.</div>
+        <div style="background:var(--aml);border:1px solid var(--amb);border-radius:8px;padding:10px;font-size:10px;color:var(--am)">⚠ Existing annotations reference the previous version. They will be detached.</div>
+      </div>
+    </div>
+    <div class="bg">
+      <button class="btn btn-p" onclick="document.getElementById('replace-modal').style.display='none'">✓ Upload replacement</button>
+      <button class="btn" onclick="document.getElementById('replace-modal').style.display='none'">Cancel</button>
+    </div>
+    <p class="wf-note">↑ Replacement saved as a new image version (source: manual_replacement). Does not go through AI pipeline.</p>
+  </div>
+</div>
+
+<!-- S11: End of Batch -->
+<div id="s-st-eob" class="screen" style="flex-direction:column">
+  <div class="eob">
+    <div class="eob-card">
+      <div style="font-size:40px;margin-bottom:12px">🎉</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:5px">End of Batch</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:22px">103 Oak Street · Review complete</div>
+      <div class="mg g3" style="text-align:left;margin-bottom:18px">
+        <div class="mc"><div class="mcl">✓ Approved</div><div class="mcv" style="color:var(--gn)">4</div></div>
+        <div class="mc"><div class="mcl">↩ Skipped</div><div class="mcv" style="color:var(--am)">1</div></div>
+        <div class="mc"><div class="mcl">Not reviewed</div><div class="mcv" style="color:var(--t3)">0</div></div>
+      </div>
+      <button class="btn btn-g" style="width:100%;justify-content:center;padding:13px;font-size:14px;margin-bottom:10px" onclick="go('st-detail')">✓ Send 4 approved images to Aryeo</button>
+      <button class="btn" style="width:100%;justify-content:center;padding:10px;font-size:12px;margin-bottom:16px" onclick="go('st-review')">↩ Review 1 skipped image</button>
+      <div class="alert a-in" style="text-align:left"><span class="a-ic">ℹ</span><div>All 4 images will be flattened (annotations composited) and delivered to Aryeo in parallel. You'll see per-image delivery status after confirming.</div></div>
+      <p class="wf-note">↑ Batch send replaces the old per-image approve-and-send flow. One click delivers all approved images. Failed deliveries shown inline with retry.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S12: Re-prompt -->
+<div id="s-st-reprompt" class="screen" style="position:relative">
+  <div class="layout">
+    <nav class="sb" id="sb-reprompt"><!-- JS injected --></nav>
+    <div class="main" style="position:relative">
+      <div style="opacity:.2;pointer-events:none">
+        <div class="ptitle" style="margin-bottom:12px">pool_area.jpg</div>
+        <div class="igrid g2"><div class="ba-img ph-gen" style="height:160px"></div><div class="ba-img ph-ai" style="height:160px"></div></div>
+      </div>
+      <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);width:520px;z-index:10">
+        <div style="background:var(--card);border-radius:15px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.15);border:1px solid var(--bd)">
+          <div style="font-size:15px;font-weight:700;margin-bottom:3px">↺ Re-prompt AI</div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:14px">pool_area.jpg · V1 active → generates V2</div>
+          <!-- Re-apply toggles -->
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;margin-bottom:6px;color:var(--t1)">⚙ Re-apply AI options for V2</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="padding:5px 9px;font-size:10px;border-radius:6px;background:var(--gnl);color:var(--gn);border:1px solid var(--gnb);font-weight:600;cursor:pointer">🌿 Grass ON</div>
+              <div style="padding:5px 9px;font-size:10px;border-radius:6px;background:var(--gnl);color:var(--gn);border:1px solid var(--gnb);font-weight:600;cursor:pointer">💧 Pool ON</div>
+              <div style="padding:5px 9px;font-size:10px;border-radius:6px;background:#F1EDE6;color:var(--t2);border:1px solid var(--bd);cursor:pointer">📺 TV OFF</div>
+            </div>
+            <p style="font-size:9px;color:var(--t3);margin-top:4px">Pre-loaded from V1. Click to toggle for V2.</p>
+          </div>
+          <!-- Voice + text prompt -->
+          <div class="field">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <label style="margin-bottom:0">Your prompt for V2</label>
+              <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">🎤 Speak prompt</button>
+            </div>
+            <textarea id="prompt-ta" placeholder="Describe changes — e.g. Make the pool water even more vibrant blue. Remove the pool cleaning equipment from the bottom right corner." style="height:88px;resize:vertical;line-height:1.6"></textarea>
+            <div style="font-size:9px;color:#bbb;text-align:right;margin-top:2px">0 / 2000</div>
+          </div>
+          <!-- Preset prompts - Phase 2 note -->
+          <div style="background:#F9F7F4;border:1px solid var(--bd);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:10px;color:var(--t2)">
+            <b style="color:var(--t1)">Preset prompts</b> — Phase 2 feature. Quick-insert buttons for common refinements (fireplace, TV, pool etc.) will be added once AI weaknesses are identified from production usage.
+          </div>
+          <div style="background:#F5F3EF;border-radius:7px;padding:9px 12px;font-size:10px;color:var(--t2);margin-bottom:14px;line-height:1.5">ℹ Base prompt + active toggles apply automatically. Your custom prompt adds on top.</div>
+          <div class="bg">
+            <button class="btn btn-p" onclick="go('st-review')">↺ Regenerate image</button>
+            <button class="btn" onclick="go('st-review')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S13: Annotation Canvas -->
+<div id="s-st-canvas" class="screen">
+  <div class="canvas-wrap">
+    <div class="ctop">
+      <div class="ctop-l"><p onclick="go('st-review')" style="cursor:pointer">← Back to batch review</p><p>Annotation Editor — pool_area.jpg</p></div>
+      <div class="bg">
+        <button class="tbn" onclick="toggleNotes()">📋 Notes</button>
+        <button class="tbn">⬇ Download</button>
+        <button class="tbn on" onclick="go('st-review')">💾 Save & return to review</button>
+        <button class="tbn" style="background:rgba(10,95,67,.2);color:#5CE8A8;border-color:rgba(10,95,67,.4)" onclick="go('st-eob')">✓ Approve & send</button>
+      </div>
+    </div>
+    <div class="ctool">
+      <span style="font-size:8px;color:#444;margin-right:3px;letter-spacing:.1em;font-weight:700;text-transform:uppercase">Tools</span>
+      <button class="tbn on">👆 Select</button>
+      <div style="width:1px;height:16px;background:#333;margin:0 2px"></div>
+      <button class="tbn lot" id="t-lot" onclick="setTool('lot')">⬡ Lot outline</button>
+      <button class="tbn" id="t-pin" onclick="setTool('pin')">📍 Push pin</button>
+      <button class="tbn" id="t-crop" onclick="setTool('crop')">✂ Crop</button>
+      <div style="width:1px;height:16px;background:#333;margin:0 2px"></div>
+      <button class="tbn">↩ Undo</button>
+      <button class="tbn">🗑 Delete</button>
+      <div style="width:1px;height:16px;background:#333;margin:0 2px"></div>
+      <button class="tbn">🔍+</button><button class="tbn">🔍−</button><button class="tbn">⛶ Fit</button>
+    </div>
+    <!-- Lot style panel -->
+    <div id="sp-lot" class="csp csp-lot">
+      <span style="font-size:9px;font-weight:800;color:#8B7EE8;letter-spacing:.07em">LOT OUTLINE</span>
+      <div class="spi"><label>Color</label><div style="display:flex;gap:4px"><div class="sw on" style="background:#E5A823"></div><div class="sw" style="background:#E24B4A"></div><div class="sw" style="background:#378ADD"></div><div class="sw" style="background:#1D9E75"></div></div></div>
+      <div class="spi"><label>Thickness</label><select><option>2px</option><option>3px</option><option>4px</option></select></div>
+      <div class="spi"><label>Fill opacity</label><input type="range" min="0" max="100" value="20"></div>
+      <div class="spi"><label>Mode</label><select><option>Outline + fill inside</option><option>Fill outside (mask)</option><option>Outline only</option></select></div>
+      <div class="spi" style="flex:1;min-width:180px;border-left:1px solid rgba(139,126,232,.35);padding-left:12px"><label style="color:#8B7EE8">Label for this lot line ↓</label><input type="text" placeholder="e.g. Lot outline A · Property boundary…" style="background:#1A1A18;border-color:#3A3A37;color:#eee;width:100%"></div>
+    </div>
+    <!-- Pin style panel -->
+    <div id="sp-pin" class="csp csp-pin" style="display:none">
+      <span style="font-size:9px;font-weight:800;color:#E4945A;letter-spacing:.07em">PUSH PIN</span>
+      <div class="spi"><label>Pin style (2 default pre-placed)</label><div style="display:flex;gap:4px;align-items:center;margin-top:3px">
+        <div style="width:26px;height:26px;border-radius:5px;border:2px solid #fff;background:rgba(61,50,176,.3);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="12" height="16" viewBox="0 0 12 16"><ellipse cx="6" cy="5.5" rx="5" ry="5" fill="#7B6FE8"/><line x1="6" y1="10.5" x2="6" y2="16" stroke="#7B6FE8" stroke-width="2.5"/></svg></div>
+        <div style="width:26px;height:26px;border-radius:5px;border:1px solid #333;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="12" height="16" viewBox="0 0 12 16"><polygon points="6,1 11,15 1,15" fill="#D85A30"/></svg></div>
+        <div style="width:26px;height:26px;border-radius:5px;border:1px solid #333;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="12" height="16" viewBox="0 0 12 16"><polygon points="6,1 11,8 6,15 1,8" fill="#0F6E56"/></svg></div>
+        <div style="width:26px;height:26px;border-radius:5px;border:1.5px dashed #555;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#777">+</div>
+      </div></div>
+      <div class="spi"><label>Size</label><select><option>Small</option><option selected>Medium</option><option>Large</option></select></div>
+      <div class="spi" style="flex:1;min-width:180px;border-left:1px solid rgba(228,148,90,.35);padding-left:12px"><label style="color:#E4945A">Label for this pin ↓</label><input type="text" placeholder="e.g. Front entrance · Garage…" style="background:#1A1A18;border-color:#3A3A37;color:#eee;width:100%"></div>
+    </div>
+    <!-- Crop panel -->
+    <div id="sp-crop" class="csp csp-crop" style="display:none">
+      <span style="font-size:9px;font-weight:800;color:#EF4444;letter-spacing:.07em">CROP TOOL</span>
+      <div class="spi"><label>Aspect ratio</label><select><option>Free</option><option>4:3</option><option>16:9</option><option>1:1</option><option>3:2</option></select></div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:3px">
+        <button style="padding:5px 10px;font-size:10px;font-weight:600;border:1px solid #EF4444;background:rgba(220,38,38,.15);color:#EF4444;border-radius:6px;cursor:pointer;font-family:Inter,sans-serif">✓ Apply crop</button>
+        <button style="padding:5px 10px;font-size:10px;border:1px solid #333;background:transparent;color:#888;border-radius:6px;cursor:pointer;font-family:Inter,sans-serif" onclick="setTool('sel')">Cancel</button>
+        <span style="font-size:9px;color:#666;margin-left:4px">Original preserved · Crop stored as new version</span>
+      </div>
+    </div>
+    <div class="cbody">
+      <div class="cimg">
+        <div class="ph-pool" style="width:100%;height:100%;min-height:240px;position:relative">
+          <svg width="100%" height="100%" viewBox="0 0 600 300" style="position:absolute;inset:0">
+            <polygon points="80,250 165,80 320,68 390,210 260,265" fill="rgba(229,168,35,.18)" stroke="#E5A823" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="80" cy="250" r="5" fill="#E5A823" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+            <circle cx="165" cy="80" r="5" fill="#E5A823" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+            <circle cx="320" cy="68" r="5" fill="#E5A823" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+            <circle cx="390" cy="210" r="5" fill="#E5A823" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+            <circle cx="260" cy="265" r="5" fill="#E5A823" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+            <rect x="170" y="160" width="90" height="18" rx="3" fill="rgba(229,168,35,.9)"/>
+            <text x="215" y="173" font-size="10" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Lot outline A</text>
+            <!-- Default pin 1 -->
+            <ellipse cx="460" cy="85" rx="13" ry="13" fill="#534AB7" opacity=".95"/>
+            <line x1="460" y1="98" x2="460" y2="112" stroke="#534AB7" stroke-width="2.5"/>
+            <rect x="422" y="114" width="76" height="16" rx="3" fill="rgba(0,0,0,.7)"/>
+            <text x="460" y="126" font-size="9.5" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Front entrance</text>
+            <text x="460" y="138" font-size="7.5" fill="rgba(255,255,255,.5)" text-anchor="middle" font-family="Inter,sans-serif">default pin 1</text>
+            <!-- Default pin 2 -->
+            <ellipse cx="160" cy="195" rx="11" ry="11" fill="#0F6E56" opacity=".9"/>
+            <line x1="160" y1="206" x2="160" y2="218" stroke="#0F6E56" stroke-width="2.5"/>
+            <rect x="128" y="220" width="64" height="15" rx="3" fill="rgba(0,0,0,.65)"/>
+            <text x="160" y="231" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Pool area</text>
+            <text x="160" y="242" font-size="7.5" fill="rgba(255,255,255,.5)" text-anchor="middle" font-family="Inter,sans-serif">default pin 2</text>
+          </svg>
+          <div style="position:absolute;bottom:8px;left:10px;font-size:9px;font-weight:500;background:rgba(0,0,0,.6);color:rgba(255,255,255,.9);padding:3px 9px;border-radius:5px">pool_area.jpg · AI Enhanced V1 · 2 default pins pre-placed · Click canvas to place lot outline points</div>
+        </div>
+      </div>
+      <div class="crt">
+        <div class="crh">ANNOTATIONS (4)</div>
+        <div class="lyr"><div class="ldot" style="background:#E5A823;border-radius:2px"></div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#ddd">Lot outline A</div><div style="font-size:9px;color:#555">5 pts · amber · filled</div></div><span>👁</span></div>
+        <div class="lyr" style="background:#1A1A18"><div class="ldot" style="background:#534AB7;border-radius:50%"></div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#ddd">Pin: Front entrance</div><div style="font-size:9px;color:#555">Default · purple</div></div><span>👁</span></div>
+        <div class="lyr"><div class="ldot" style="background:#0F6E56;border-radius:50%"></div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#ddd">Pin: Pool area</div><div style="font-size:9px;color:#555">Default · green</div></div><span>👁</span></div>
+        <div class="lyr"><div class="ldot" style="background:#444;border-radius:50%"></div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#666">Pin: [unlabelled]</div><div style="font-size:9px;color:#444">Default pin 3</div></div><span>👁</span></div>
+        <div style="padding:10px;margin-top:auto;border-top:1px solid #222">
+          <div style="font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;font-weight:700">Style preset</div>
+          <select style="width:100%;font-size:10px;background:#1A1A18;border-color:#333;color:#bbb"><option>Default</option><option>Lot boundary</option><option>Aerial marker</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="tstrip">
+      <span style="font-size:8px;color:#444;font-weight:700;flex-shrink:0;margin-right:5px;text-transform:uppercase;letter-spacing:.08em">Batch</span>
+      <div class="tsi sel ph-aer" style="border-color:var(--bl)"><div class="tsi-ok">✓</div></div>
+      <div class="tsi ph-pool" style="border:2px solid var(--bl)"></div>
+      <div class="tsi ph-ext"><div class="tsi-ok">✓</div></div>
+      <div class="tsi ph-int"></div>
+      <div class="tsi ph-int"></div>
+      <span style="font-size:9px;color:#444;margin-left:8px">↑ Click to switch · ✓ = approved · Orange dot = has annotations</span>
+    </div>
+  </div>
+</div>
+
+<!-- S14: History -->
+<div id="s-st-history" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-history"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">History</div>
+      <div class="psub">All processed images — final versions only</div>
+      <div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px;letter-spacing:.04em">LISTING</div><select style="font-size:11px;width:160px"><option>All listings</option><option>103 Oak Street</option><option>55 Elm Ave</option></select></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px;letter-spacing:.04em">TYPE</div><div class="ftabs"><button class="ftab on">All</button><button class="ftab">Interior</button><button class="ftab">Exterior</button><button class="ftab">Aerial</button></div></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px;letter-spacing:.04em">TIME</div><div class="ftabs"><button class="ftab">Today</button><button class="ftab on">This week</button><button class="ftab">This month</button></div></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px;letter-spacing:.04em">STATUS</div><div class="ftabs"><button class="ftab on">All (48)</button><button class="ftab">Pending (5)</button><button class="ftab">Sent (31)</button></div></div>
+          <button class="btn btn-sm">Clear</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-bottom:10px">Showing <b>6 images</b> · All types · This week</div>
+      <div class="igrid g3">
+        <div class="icard"><div class="ith ph-aer"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-aer">Aerial</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">aerial_view.jpg</div><div class="ipr">103 Oak St · James B.</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Today</span></div><div class="ian">1 lot outline · 2 pins</div></div></div>
+        <div class="icard"><div class="ith ph-pool"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-ext">Exterior</span><span class="badge b-pend">Pending</span></div></div><div class="iinf"><div class="inm">pool_area.jpg</div><div class="ipr">103 Oak St · James B.</div><div class="ibt"><span class="badge b-pend">Pending</span><span style="font-size:9px;color:#bbb">Today</span></div></div></div>
+        <div class="icard"><div class="ith ph-int"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-int">Interior</span><span class="badge b-rep">Replaced</span></div></div><div class="iinf"><div class="inm">kitchen_wide.jpg</div><div class="ipr">103 Oak St · Sarah K.</div><div class="ibt"><span class="badge b-rep">Manually replaced</span><span style="font-size:9px;color:#bbb">Today</span></div></div></div>
+        <div class="icard"><div class="ith ph-int"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-int">Interior</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">living_room.jpg</div><div class="ipr">103 Oak St · James B.</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Yesterday</span></div></div></div>
+        <div class="icard"><div class="ith ph-ext"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-ext">Exterior</span><span class="badge b-sent">Sent</span></div></div><div class="iinf"><div class="inm">exterior_front.jpg</div><div class="ipr">55 Elm Ave · James B.</div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Mon</span></div></div></div>
+        <div class="icard"><div class="ith ph-aer"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-aer">Aerial</span><span class="badge b-pend">Pending</span></div></div><div class="iinf"><div class="inm">aerial_02.jpg</div><div class="ipr">12 Pine Rd · Sarah K.</div><div class="ibt"><span class="badge b-pend">Pending</span><span style="font-size:9px;color:#bbb">Sun</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     ADMIN SCREENS
+════════════════════════════════════════════════ -->
+
+<!-- A1: Admin Login -->
+<div id="s-ad-login" class="screen">
+  <div class="login-wrap">
+    <div class="lcard">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:22px">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--pu);display:flex;align-items:center;justify-content:center;font-size:17px">🛡</div>
+        <div><div style="font-size:14px;font-weight:700">AI Photo Platform</div><div style="font-size:10px;color:#999">Admin Panel</div></div>
+      </div>
+      <h2 style="font-size:19px;font-weight:700;margin-bottom:3px">Admin login</h2>
+      <p style="font-size:11px;color:#888;margin-bottom:20px">Platform administration · Separate from staff portal</p>
+      <div class="field"><label>Email address</label><input type="email" placeholder="admin@company.com"></div>
+      <div class="field"><label>Password</label><input type="password" placeholder="••••••••"></div>
+      <button class="btn btn-pu" style="width:100%;justify-content:center;padding:10px;font-size:12px" onclick="go('ad-dash')">Sign in to Admin →</button>
+      <p style="font-size:10px;color:#aaa;text-align:center;margin-top:14px">Staff credentials do not work here · Different URL from staff portal</p>
+    </div>
+  </div>
+</div>
+
+<!-- A2: Admin Dashboard -->
+<div id="s-ad-dash" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-adash"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Admin Dashboard</div>
+      <div class="psub">Platform-wide overview — all users, all listings, all images</div>
+      <div class="mg g5">
+        <div class="mc"><div class="mcl">Users</div><div class="mcv">4</div></div>
+        <div class="mc"><div class="mcl">Listings</div><div class="mcv">22</div></div>
+        <div class="mc"><div class="mcl">Images processed</div><div class="mcv">284</div></div>
+        <div class="mc"><div class="mcl">Sent to Aryeo</div><div class="mcv" style="color:var(--gn)">261</div></div>
+        <div class="mc"><div class="mcl">Pending</div><div class="mcv" style="color:var(--am)">23</div></div>
+      </div>
+      <div class="igrid g2">
+        <div class="card"><div class="ctitle" style="margin-bottom:10px">Quick navigation</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn" style="justify-content:flex-start;padding:9px 12px" onclick="go('ad-users')">👥 User Management</button>
+            <button class="btn" style="justify-content:flex-start;padding:9px 12px" onclick="go('ad-listings')">🏡 Listing Management</button>
+            <button class="btn btn-pu" style="justify-content:flex-start;padding:9px 12px" onclick="go('ad-media')">🖼 Media Gallery</button>
+            <button class="btn" style="justify-content:flex-start;padding:9px 12px" onclick="go('ad-prompt')">✏ Prompt & Model</button>
+            <button class="btn" style="justify-content:flex-start;padding:9px 12px" onclick="go('ad-logs')">📋 Activity Logs</button>
+          </div>
+        </div>
+        <div class="card"><div class="ctitle" style="margin-bottom:10px">Recent activity (all users)</div>
+          <div class="ai"><div class="ad" style="background:var(--gn)"></div><div style="flex:1"><div>8 images sent to Aryeo — <b>Mark Smith</b></div><div class="am">103 Oak St · Today</div></div></div>
+          <div class="ai"><div class="ad" style="background:var(--pu)"></div><div style="flex:1"><div>Annotations saved — <b>Mark Smith</b></div><div class="am">pool_area.jpg · 1 hr ago</div></div></div>
+          <div class="ai"><div class="ad" style="background:var(--bl)"></div><div style="flex:1"><div>AI processing complete — 6 images</div><div class="am">55 Elm Ave · Jane Doe · 2 hr ago</div></div></div>
+          <div class="ai"><div class="ad" style="background:var(--am)"></div><div style="flex:1"><div>Model changed to <b>Gemini 3.1 Flash</b></div><div class="am">By Jane Doe · Yesterday</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A3: User Management -->
+<div id="s-ad-users" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-ausers"><!-- JS injected --></nav>
+    <div class="main">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+        <div><div class="ptitle">User Management</div><div class="psub" style="margin-bottom:0">Invite, edit roles, activate or deactivate staff</div></div>
+        <button class="btn btn-p" onclick="go('ad-useradd')">+ Invite new user</button>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:12px">
+        <div class="srch"><span class="sic">🔍</span><input type="text" placeholder="Search by name or email…"></div>
+        <select style="font-size:11px;width:120px"><option>All roles</option><option>Admin</option><option>Staff</option></select>
+        <select style="font-size:11px;width:130px"><option>All statuses</option><option>Active</option><option>Inactive</option></select>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Last login</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="ava av-at">JD</div><b>Jane Doe</b></div></td><td style="color:#888">jane@co.com</td><td><span class="badge b-adm">Admin</span></td><td><span class="badge b-sent">Active</span></td><td style="font-size:10px;color:#aaa">Jan 10</td><td style="font-size:10px;color:#aaa">Now</td><td><button class="btn btn-sm" onclick="go('ad-useradd')">Edit</button></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="ava av-st">MS</div><b>Mark Smith</b></div></td><td style="color:#888">mark@co.com</td><td><span class="badge b-stf">Staff</span></td><td><span class="badge b-sent">Active</span></td><td style="font-size:10px;color:#aaa">Jan 12</td><td style="font-size:10px;color:#aaa">10 min ago</td><td><div class="bg"><button class="btn btn-sm" onclick="go('ad-useradd')">Edit</button><button class="btn btn-rd btn-sm">Deactivate</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="ava av-df">AL</div><b>Amy Lee</b></div></td><td style="color:#888">amy@co.com</td><td><span class="badge b-stf">Staff</span></td><td><span class="badge b-neu">Inactive</span></td><td style="font-size:10px;color:#aaa">Feb 3</td><td style="font-size:10px;color:#aaa">3 days ago</td><td><div class="bg"><button class="btn btn-sm">Edit</button><button class="btn btn-sm" style="background:var(--gnl);color:var(--gn);border-color:var(--gnb)">Activate</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:7px"><div class="ava av-df" style="font-size:11px">✉</div><b>Robert Chen</b></div></td><td style="color:#888">rob@co.com</td><td><span class="badge b-stf">Staff</span></td><td><span class="badge b-pend">Invite pending</span></td><td style="font-size:10px;color:#aaa">Today</td><td style="font-size:10px;color:#aaa">—</td><td><button class="btn btn-sm">Resend invite</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A4: Add/Edit User -->
+<div id="s-ad-useradd" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-auseradd"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="bc" onclick="go('ad-users')">← User Management</div>
+      <div class="ptitle">Add New User</div>
+      <div class="psub">User receives an email invite to set their own password</div>
+      <div class="card" style="max-width:500px">
+        <div class="igrid g2" style="gap:9px;margin-bottom:12px">
+          <div class="field" style="margin-bottom:0"><label>First name <span style="color:var(--rd)">*</span></label><input type="text" placeholder="Jane"></div>
+          <div class="field" style="margin-bottom:0"><label>Last name <span style="color:var(--rd)">*</span></label><input type="text" placeholder="Doe"></div>
+        </div>
+        <div class="field"><label>Email <span style="color:var(--rd)">*</span></label><input type="email" placeholder="jane@company.com"></div>
+        <div class="field"><label>Role <span style="color:var(--rd)">*</span></label>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:5px">
+            <label style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;cursor:pointer">
+              <input type="radio" name="role" style="width:auto;margin-top:2px;flex-shrink:0"> <div><div style="font-size:12px;font-weight:600">Admin</div><div style="font-size:10px;color:var(--t2)">Full platform access including user management, prompt control, and all analytics</div></div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border:1.5px solid var(--gn);border-radius:8px;cursor:pointer;background:var(--gnl)">
+              <input type="radio" name="role" checked style="width:auto;margin-top:2px;flex-shrink:0"> <div><div style="font-size:12px;font-weight:600">Staff</div><div style="font-size:10px;color:var(--t2)">Listing management, image editing, annotation, and Aryeo delivery only</div></div>
+            </label>
+          </div>
+        </div>
+        <div style="background:var(--bll);border:1px solid var(--blb);border-radius:8px;padding:10px 13px;font-size:10px;color:var(--bl);margin-bottom:14px">📧 An invite email will be sent. User sets their own password on first login. Admin cannot view or set passwords.</div>
+        <div class="bg">
+          <button class="btn btn-p" onclick="go('ad-users')">✓ Send invite</button>
+          <button class="btn" onclick="go('ad-users')">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A5: Listing Management (Admin) -->
+<div id="s-ad-listings" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-alistings"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Listing Management</div>
+      <div class="psub">All listings across all staff — read-only admin view</div>
+      <div style="display:flex;gap:7px;margin-bottom:12px">
+        <div class="srch"><span class="sic">🔍</span><input type="text" placeholder="Search by name, order number, address…"></div>
+        <select style="font-size:11px;width:140px"><option>All staff</option><option>Mark Smith</option><option>Jane Doe</option></select>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Listing</th><th>Order #</th><th>Listing ID</th><th>Photographers</th><th>Created by</th><th>Total</th><th>Sent</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:600;font-size:12px">103 Oak Street</div><div style="font-size:10px;color:#aaa">Austin TX 78701</div></td><td style="font-size:11px">2024-441</td><td style="font-size:11px">#4821</td><td style="font-size:10px">James B., Sarah K.</td><td style="font-size:11px">Mark Smith</td><td style="text-align:center;font-weight:600">12</td><td style="text-align:center;color:var(--gn);font-weight:700">7</td><td><span class="badge b-pend">5 pending</span></td><td><button class="btn btn-sm">View →</button></td></tr>
+            <tr><td><div style="font-weight:600;font-size:12px">55 Elm Avenue</div><div style="font-size:10px;color:#aaa">Austin TX</div></td><td style="font-size:11px">2024-438</td><td style="font-size:11px">#4788</td><td style="font-size:10px">James B.</td><td style="font-size:11px">Mark Smith</td><td style="text-align:center;font-weight:600">6</td><td style="text-align:center;color:var(--gn);font-weight:700">6</td><td><span class="badge b-sent">Complete</span></td><td><button class="btn btn-sm">View →</button></td></tr>
+            <tr><td><div style="font-weight:600;font-size:12px">12 Pine Road</div><div style="font-size:10px;color:#aaa">Austin TX</div></td><td style="font-size:11px">2024-436</td><td style="font-size:11px">—</td><td style="font-size:10px">Sarah K.</td><td style="font-size:11px">Jane Doe</td><td style="text-align:center;font-weight:600">4</td><td style="text-align:center;color:#bbb">0</td><td><span class="badge b-proc">Processing</span></td><td><button class="btn btn-sm">View →</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A6: Media Gallery -->
+<div id="s-ad-media" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-amedia"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Media Gallery</div>
+      <div class="psub">All final images across all staff — filter by person, listing, date, or status</div>
+      <div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">STAFF</div><select style="font-size:11px;width:140px"><option>All staff</option><option>Mark Smith</option><option>Jane Doe</option></select></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">LISTING</div><select style="font-size:11px;width:150px"><option>All listings</option><option>103 Oak St</option></select></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">DATE</div><div class="ftabs"><button class="ftab">Today</button><button class="ftab on">This week</button><button class="ftab">This month</button></div></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">STATUS</div><div class="ftabs"><button class="ftab on">All</button><button class="ftab">Sent</button><button class="ftab">Pending</button></div></div>
+          <button class="btn btn-sm">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="igrid g4">
+        <div class="icard"><div class="ith ph-aer"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-aer" style="font-size:8px">Aerial</span><span class="badge b-sent" style="font-size:8px">Sent</span></div></div><div class="iinf"><div class="inm">aerial_view.jpg</div><div class="ipr" style="display:flex;justify-content:space-between"><span>103 Oak St</span><span style="color:#bbb">Mark S</span></div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Today</span></div></div></div>
+        <div class="icard"><div class="ith ph-pool"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-ext" style="font-size:8px">Ext</span><span class="badge b-pend" style="font-size:8px">Pending</span></div></div><div class="iinf"><div class="inm">pool_area.jpg</div><div class="ipr" style="display:flex;justify-content:space-between"><span>103 Oak St</span><span style="color:#bbb">Mark S</span></div><div class="ibt"><span class="badge b-pend">Pending</span><span style="font-size:9px;color:#bbb">Today</span></div></div></div>
+        <div class="icard"><div class="ith ph-int"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-int" style="font-size:8px">Int</span><span class="badge b-sent" style="font-size:8px">Sent</span></div></div><div class="iinf"><div class="inm">kitchen.jpg</div><div class="ipr" style="display:flex;justify-content:space-between"><span>55 Elm Ave</span><span style="color:#bbb">Jane D</span></div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Yesterday</span></div></div></div>
+        <div class="icard"><div class="ith ph-ext"><div class="ph-ov"></div><div style="position:absolute;top:5px;left:5px;right:5px;display:flex;justify-content:space-between"><span class="badge b-ext" style="font-size:8px">Ext</span><span class="badge b-sent" style="font-size:8px">Sent</span></div></div><div class="iinf"><div class="inm">exterior_01.jpg</div><div class="ipr" style="display:flex;justify-content:space-between"><span>55 Elm Ave</span><span style="color:#bbb">Jane D</span></div><div class="ibt"><span class="badge b-sent">Sent</span><span style="font-size:9px;color:#bbb">Mon</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A7: Prompt & Model Management -->
+<div id="s-ad-prompt" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-aprompt"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Prompt & Model Management</div>
+      <div class="psub">Configure the AI base prompt and select the active Gemini model</div>
+      <!-- MODEL SELECTOR -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="cth"><div class="ctitle">🤖 Active AI Model</div><span class="badge b-sent">Currently: Gemini 3.1 Flash</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <div class="model-card" style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;margin-bottom:3px">Gemini 2.5 Flash</div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:8px">Fastest · Lowest cost</div>
+            <div style="font-size:10px;color:var(--t3)">Min $0.023 · Typ $0.034 / img</div>
+          </div>
+          <div class="model-card sel" style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;margin-bottom:3px;color:var(--gn)">✓ Gemini 3.1 Flash</div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:8px">Balanced · Active</div>
+            <div style="font-size:10px;color:var(--t3)">Min $0.045 · Typ $0.069 / img</div>
+          </div>
+          <div class="model-card" style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;margin-bottom:3px">Gemini 3 Pro</div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:8px">Highest quality · Slowest</div>
+            <div style="font-size:10px;color:var(--t3)">Min $0.091 · Typ $0.138 / img</div>
+          </div>
+        </div>
+        <div class="alert a-wn" style="margin-bottom:10px"><span class="a-ic">⚠</span><div><div class="a-ti">Model change affects all future jobs</div>In-progress jobs continue on the model active when they were queued.</div></div>
+        <button class="btn btn-p">Save model change</button>
+      </div>
+      <!-- PROMPT -->
+      <div class="alert a-wn"><span class="a-ic">⚠</span><div><div class="a-ti">Changes affect ALL future AI processing jobs</div>Staff re-prompts and feature toggles are added on top of this base prompt.</div></div>
+      <div class="card">
+        <div class="cth"><div class="ctitle">Current active prompt</div><div style="font-size:10px;color:#aaa">Last updated: Today 09:30 · Jane Doe</div></div>
+        <textarea style="width:100%;height:160px;resize:vertical;font-family:'Courier New',monospace;font-size:11px;line-height:1.7;margin-bottom:10px;background:#FAFAF8">You are a professional real estate photo editor. Apply the following enhancements to the provided image:
+
+1. Replace or enhance the sky for better visual appeal (exterior and aerial)
+2. Apply lens correction, straighten verticals and horizontals
+3. Adjust white balance, exposure, shadows, highlights, saturation, contrast, vibrance
+4. Increase sharpness, reduce noise, remove vignetting and color casts
+5. Remove unwanted objects: pool cleaners, trash cans, realtor signs, sensor dots, cords, fridge magnets, pet accessories, camera reflections
+6. Enhance pool water to vibrant blue where applicable
+7. Add fire to fire pits and fireplaces where applicable
+8. Add realistic TV/PC screens, turn on broken lights
+9. Enhance window brightness for consistency (interior shots)
+10. Fine tune green grass color and vibrancy</textarea>
+        <div class="bg">
+          <button class="btn btn-p">✓ Save updated prompt</button>
+          <button class="btn">↩ Reset to saved</button>
+          <span style="font-size:10px;color:#aaa">Takes effect on next processing job</span>
+        </div>
+      </div>
+      <div class="card"><div class="ctitle" style="margin-bottom:9px">Prompt update history</div>
+        <div class="ai"><div class="ad" style="background:var(--gn)"></div><div><div>Prompt updated by <b>Jane Doe</b></div><div class="am">Today 09:30 · Added blue sea water instruction</div></div></div>
+        <div class="ai"><div class="ad" style="background:var(--am)"></div><div><div>Model changed to <b>Gemini 3.1 Flash</b> by <b>Jane Doe</b></div><div class="am">Yesterday · Previous: Gemini 2.5 Flash</div></div></div>
+        <div class="ai"><div class="ad" style="background:#888"></div><div><div>Prompt updated by <b>Jane Doe</b></div><div class="am">Jan 15 · Initial prompt configured</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- A8: Activity Logs -->
+<div id="s-ad-logs" class="screen">
+  <div class="layout">
+    <nav class="sb" id="sb-alogs"><!-- JS injected --></nav>
+    <div class="main">
+      <div class="ptitle">Activity Logs</div>
+      <div class="psub">Full audit trail — all users, all actions · Immutable records</div>
+      <div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">USER</div><select style="font-size:11px;width:130px"><option>All users</option><option>Mark Smith</option><option>Jane Doe</option></select></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">ACTION</div><select style="font-size:11px;width:160px"><option>All actions</option><option>Approved & sent</option><option>Batch send</option><option>Image replaced</option><option>Re-prompt</option><option>Model changed</option><option>Prompt updated</option></select></div>
+          <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:4px">DATE</div><div class="ftabs"><button class="ftab on">Today</button><button class="ftab">This week</button><button class="ftab">This month</button></div></div>
+          <button class="btn btn-sm">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Listing</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td style="font-size:10px;color:#aaa">Today 11:02</td><td>Mark Smith</td><td><span class="badge b-sent">Batch send (4 images)</span></td><td>103 Oak St</td><td style="font-size:10px;color:#888">4 images delivered to Aryeo</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Today 10:58</td><td>Mark Smith</td><td><span class="badge b-ann">Annotation saved</span></td><td>103 Oak St</td><td style="font-size:10px;color:#888">pool_area.jpg · lot outline + 2 pins</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Today 10:52</td><td>Mark Smith</td><td><span class="badge b-rep">Image replaced</span></td><td>103 Oak St</td><td style="font-size:10px;color:#888">kitchen_wide.jpg → manual replacement V2</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Today 10:45</td><td>Mark Smith</td><td><span class="badge b-proc">Re-prompt submitted</span></td><td>103 Oak St</td><td style="font-size:10px;color:#888">pool_area.jpg → V2 queued · 🌿 ON 💧 ON</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Today 10:30</td><td style="font-size:10px;color:#aaa">System</td><td><span class="badge b-proc">AI processing complete</span></td><td>103 Oak St</td><td style="font-size:10px;color:#888">aerial_view.jpg · V1 generated · Gemini 3.1 Flash</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Yesterday</td><td>Jane Doe</td><td><span class="badge b-pend">Model changed</span></td><td>—</td><td style="font-size:10px;color:#888">Gemini 2.5 Flash → Gemini 3.1 Flash</td></tr>
+            <tr><td style="font-size:10px;color:#aaa">Yesterday</td><td>Jane Doe</td><td><span class="badge b-sent">Batch send (6 images)</span></td><td>55 Elm Ave</td><td style="font-size:10px;color:#888">6 images delivered to Aryeo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ JS ══ -->
+<script>
+// ── Labels
+const labels={
+  'st-login':'Staff Login','st-dash':'Staff Dashboard','st-listings':'Select Listing',
+  'st-create':'Create Listing','st-detail':'Listing Detail','st-upload':'Upload Options',
+  'st-gallery':'Gallery Picker','st-manual':'Manual Upload','st-proc':'AI Processing',
+  'st-review':'Batch Review','st-eob':'End of Batch','st-reprompt':'Re-prompt AI',
+  'st-canvas':'Annotation Canvas','st-history':'History',
+  'ad-login':'Admin Login','ad-dash':'Admin Dashboard','ad-users':'User Management',
+  'ad-useradd':'Add / Edit User','ad-listings':'Listing Management',
+  'ad-media':'Media Gallery','ad-prompt':'Prompt & Model','ad-logs':'Activity Logs',
+};
+
+// ── Sidebar configs
+const stNav=[
+  {id:'st-dash',ic:'⊞',lbl:'Dashboard',badge:''},
+  {id:'st-listings',ic:'🔍',lbl:'Select listing',badge:''},
+  {id:'st-history',ic:'📋',lbl:'History',badge:'5'},
+];
+const atNav=[
+  {id:'ad-dash',ic:'⊞',lbl:'Dashboard',badge:''},
+  {id:'ad-users',ic:'👥',lbl:'User Management',badge:''},
+  {id:'ad-useradd',ic:'✎',lbl:'Add / Edit User',badge:''},
+  {id:'ad-listings',ic:'🏡',lbl:'Listing Management',badge:''},
+  {id:'ad-media',ic:'🖼',lbl:'Media Gallery',badge:''},
+  {id:'ad-prompt',ic:'✏',lbl:'Prompt & Model',badge:''},
+  {id:'ad-logs',ic:'📋',lbl:'Activity Logs',badge:''},
+];
+
+const sidebarMap={
+  'st-dash':'sb-dash','st-listings':'sb-listings','st-create':'sb-create',
+  'st-detail':'sb-detail','st-upload':'sb-upload','st-gallery':'sb-gallery',
+  'st-manual':'sb-manual','st-proc':'sb-proc','st-reprompt':'sb-reprompt','st-history':'sb-history',
+  'ad-dash':'sb-adash','ad-users':'sb-ausers','ad-useradd':'sb-auseradd',
+  'ad-listings':'sb-alistings','ad-media':'sb-amedia','ad-prompt':'sb-aprompt','ad-logs':'sb-alogs',
+};
+
+function buildSB(slotId, items, role, name, initials, sub) {
+  const slot = document.getElementById(slotId);
+  if (!slot || slot.dataset.built) return;
+  slot.dataset.built = '1';
+  const logoColor = role==='staff' ? 'var(--gn)' : 'var(--pu)';
+  const icon = role==='staff' ? '✦' : '🛡';
+  const av = role==='staff' ? 'av-st' : 'av-at';
+  const subColor = role==='staff' ? '#0A5F43' : '#6B63D4';
+  let navHTML = items.map(n=>`
+    <div class="ni" id="ni-${n.id}" onclick="go('${n.id}')">
+      <div class="ni-ic">${n.ic}</div>${n.lbl}
+      ${n.badge?`<span class="ni-b">${n.badge}</span>`:''}
+    </div>`).join('');
+  slot.innerHTML=`
+    <div class="sb-brand">
+      <div class="sb-logo ${role==='staff'?'st':'at'}">${icon}</div>
+      <div><div class="sb-nm">AI Photo Platform</div><div class="sb-sub ${role==='staff'?'st':'at'}" style="color:${subColor}">${sub}</div></div>
+    </div>
+    <div class="sb-nav">${navHTML}</div>
+    <div class="sb-foot"><div class="urow">
+      <div class="ava ${av}">${initials}</div>
+      <div><div class="un">${name}</div><div class="ur" style="color:${subColor}">${sub}</div></div>
+    </div></div>`;
+}
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.sp').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const el=document.getElementById('s-'+id);
+  if(!el) return;
+  el.classList.add('on');
+  const btn=document.querySelector(`[data-s="${id}"]`);
+  if(btn) btn.classList.add('on');
+  const t=document.getElementById('c-title');
+  if(t) t.textContent=labels[id]||id;
+  // Build sidebar
+  const isAdmin=id.startsWith('ad-');
+  const slotId=sidebarMap[id];
+  if(slotId){
+    if(isAdmin) buildSB(slotId,atNav,'admin','Jane Doe','JD','Admin');
+    else buildSB(slotId,stNav,'staff','Mark Smith','MS','Staff');
+  }
+  // Highlight nav item
+  if(slotId){
+    const ni=document.getElementById('ni-'+id);
+    if(ni) ni.classList.add('on');
+    else{
+      // Find closest nav match
+      const base=id.replace(/-detail|-create|-upload|-gallery|-manual|-proc|-review|-eob|-reprompt|-canvas|-useradd/,'');
+      const fallback=document.getElementById('ni-'+base+'-listings')||document.getElementById('ni-'+base+'-dash');
+      if(fallback) fallback.classList.add('on');
+    }
+  }
+  window.scrollTo(0,0);
+  // Close any dropdowns
+  document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
+}
+
+// ── Canvas tools
+function setTool(t){
+  document.querySelectorAll('.tbn').forEach(b=>{if(['t-lot','t-pin','t-crop'].includes(b.id))b.className='tbn';});
+  document.querySelectorAll('.csp').forEach(p=>p.style.display='none');
+  const b=document.getElementById('t-'+t);
+  if(b)b.classList.add(t);
+  const sp=document.getElementById('sp-'+t);
+  if(sp)sp.style.display='flex';
+}
+
+// ── Dropdown
+function toggleDD(id){
+  const m=document.getElementById(id);
+  if(m) m.classList.toggle('open');
+}
+function closeDD(id){
+  const m=document.getElementById(id);
+  if(m) m.classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.dd-wrap'))
+    document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));
+});
+
+// ── Notes panel
+function toggleNotes(){
+  document.getElementById('notes-panel').classList.toggle('open');
+}
+
+// ── Replace image modal
+function showReplaceModal(){
+  document.getElementById('replace-modal').style.display='flex';
+}
+
+// ── Batch review state
+let reviewState={cur:1,total:5,approved:2,skipped:0};
+function updateReviewBar(){
+  document.getElementById('br-cur').textContent=reviewState.cur;
+  document.getElementById('br-fill').style.width=((reviewState.cur/reviewState.total)*100)+'%';
+}
+function nextImg(){
+  if(reviewState.cur<reviewState.total){ reviewState.cur++; updateReviewBar(); }
+  else go('st-eob');
+}
+function prevImg(){
+  if(reviewState.cur>1){ reviewState.cur--; updateReviewBar(); }
+}
+function approveImg(){
+  reviewState.approved++;
+  nextImg();
+}
+function skipImg(){
+  reviewState.skipped++;
+  nextImg();
+}
+
+// ── Voice input
+let recognizing=false;
+function toggleVoice(){
+  const btn=document.getElementById('voice-btn');
+  const ta=document.getElementById('prompt-ta');
+  if(!recognizing){
+    recognizing=true;
+    btn.classList.add('rec');
+    btn.textContent='🔴 Recording… (click to stop)';
+    // Simulate transcription after 2s
+    setTimeout(()=>{
+      if(recognizing){
+        ta.value=(ta.value?ta.value+' ':'')+'Make the pool water much more vibrant and saturated blue. The current output is not blue enough.';
+        toggleVoice();
+      }
+    },2000);
+  } else {
+    recognizing=false;
+    btn.classList.remove('rec');
+    btn.textContent='🎤 Speak prompt';
+  }
+}
+
+// Init
+go('st-login');
+</script>
+</body>
+</html>
